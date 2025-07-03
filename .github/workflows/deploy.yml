@@ -19,5 +19,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            git config --global --add safe.directory ${{ secrets.TARGET_DIR }}
             cd ${{ secrets.TARGET_DIR }}
             git pull origin main
