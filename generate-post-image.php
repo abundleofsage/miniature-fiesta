@@ -19,11 +19,34 @@ if (!file_exists($font_regular_path) || !file_exists($font_bold_path)) {
     die("Error: Font files not found. Please download Fredoka-Regular.ttf and Fredoka-Bold.ttf and place them in the same directory as this script.");
 }
 
+// --- Template and Color Configuration ---
+$selected_template = isset($_GET['template']) ? intval($_GET['template']) : 1; // Default to template 1
+$custom_accent_color_hex = isset($_GET['accent_color']) ? $_GET['accent_color'] : null;
+
 
 // --- No need to edit below this line ---
 
 // --- Data Fetching and Parsing (Re-used from your original script) ---
 require_once('calendar-functions.php');
+
+/**
+ * Converts a HEX color string to an RGB array.
+ *
+ * @param string $hex_color The hex color string (e.g., "FF0000").
+ * @return array|null RGB array [r, g, b] or null if invalid hex.
+ */
+function hex_to_rgb($hex_color) {
+    $hex_color = ltrim($hex_color, '#');
+    if (strlen($hex_color) == 6) {
+        list($r, $g, $b) = sscanf($hex_color, "%02x%02x%02x");
+        return [$r, $g, $b];
+    } elseif (strlen($hex_color) == 3) {
+        list($r, $g, $b) = sscanf($hex_color, "%1x%1x%1x");
+        return [$r * 16 + $r, $g * 16 + $g, $b * 16 + $b];
+    }
+    return null; // Invalid hex
+}
+
 
 /**
  * Wraps text to a specific width for GD image functions.
@@ -111,12 +134,21 @@ $accent_colors_palette = [
 ];
 // Pick a random color from the palette
 $random_color_rgb = $accent_colors_palette[array_rand($accent_colors_palette)];
+$accent_rgb = $random_color_rgb; // Default to random
+
+// Override with custom color if provided and valid
+if ($custom_accent_color_hex) {
+    $parsed_rgb = hex_to_rgb($custom_accent_color_hex);
+    if ($parsed_rgb) {
+        $accent_rgb = $parsed_rgb;
+    }
+}
 
 // 2. Define Colors
 $color_bg_dark = imagecolorallocate($image, 23, 23, 23); // Almost black
 $color_text_light = imagecolorallocate($image, 245, 245, 245); // Off-white
 $color_text_medium = imagecolorallocate($image, 160, 160, 160); // Gray
-$color_accent_random = imagecolorallocate($image, $random_color_rgb[0], $random_color_rgb[1], $random_color_rgb[2]);
+$color_accent = imagecolorallocate($image, $accent_rgb[0], $accent_rgb[1], $accent_rgb[2]);
 
 
 // 3. Draw Background
@@ -125,36 +157,42 @@ imagefill($image, 0, 0, $color_bg_dark);
 // This variable will track the vertical position for the next element.
 $y_pos = $padding;
 
-// 4. Add Logo
+// 4. Add Logo (Common to all templates)
 $logo_path = 'outfront-logo.png'; // Make sure the color logo is in the same directory
 if (file_exists($logo_path)) {
     $logo_img = imagecreatefrompng($logo_path);
     list($logo_w_orig, $logo_h_orig) = getimagesize($logo_path);
     
-    // Define a new, more manageable width for the logo
-    $new_logo_w = 800;
-    // Calculate the new height to maintain the aspect ratio
+    $new_logo_w = ($selected_template == 3) ? 600 : 800; // Smaller logo for template 3
     $new_logo_h = $new_logo_w * ($logo_h_orig / $logo_w_orig);
-    // Calculate the X coordinate to center the logo
     $logo_x = ($width - $new_logo_w) / 2;
+    if ($selected_template == 3) {
+        $logo_x = $padding + 350; // Position logo to the right for template 3
+    }
     
-    // Place the centered logo on the canvas
     imagecopyresampled($image, $logo_img, $logo_x, $y_pos, 0, 0, $new_logo_w, $new_logo_h, $logo_w_orig, $logo_h_orig);
     imagedestroy($logo_img);
 
-    // Update the Y position to be below the logo for the next element
     $y_pos += $new_logo_h;
 
-    // --- Add "youth group" tagline ---
-    $y_pos += 40; // Small space below the logo
+    $tagline_y_pos = $y_pos + 40;
     $tagline_text = "youth group";
     $tagline_font_size = 38;
     $tagline_bbox = imagettfbbox($tagline_font_size, 0, $font_regular_path, $tagline_text);
     $tagline_width = $tagline_bbox[2] - $tagline_bbox[0];
     $tagline_x = ($width - $tagline_width) / 2;
-    imagettftext($image, $tagline_font_size, 0, $tagline_x, $y_pos, $color_text_medium, $font_regular_path, $tagline_text);
-    $y_pos += abs($tagline_bbox[7] - $tagline_bbox[1]); // Add tagline height to y_pos
+    if ($selected_template == 3) {
+        $tagline_x = $padding + 350 + (($new_logo_w - $tagline_width)/2); // Center under smaller logo
+    }
+    imagettftext($image, $tagline_font_size, 0, $tagline_x, $tagline_y_pos, $color_text_medium, $font_regular_path, $tagline_text);
+
+    if ($selected_template != 3) { // For template 1 and 2, tagline pushes main content down
+         $y_pos = $tagline_y_pos + abs($tagline_bbox[7] - $tagline_bbox[1]);
+    } else { // For template 3, tagline is alongside, so y_pos for main content is different
+        $y_pos = $padding + $new_logo_h + 50; // Reset y_pos for main content area
+    }
 }
+
 
 // 5. Prepare Text Content from the event data
 $date_formatted = date('l, F jS, Y', strtotime($target_event['date']));
@@ -166,43 +204,136 @@ if (empty($location)) {
     $location = '128 S. Union Ave, Pueblo, CO'; // Default location if not specified
 }
 
+// 6. Draw Text onto Image based on selected template
 
-// 6. Draw Text onto Image
-
-// Add some space between the logo/tagline and the title
-$y_pos += 80;
-
-// --- Title ---
+// Template-specific variables
 $title_font_size = 70;
-$wrapped_title = wrap_text($title_font_size, 0, $font_bold_path, $title, $width - ($padding * 2));
-imagettftext($image, $title_font_size, 0, $padding, $y_pos, $color_text_light, $font_bold_path, $wrapped_title);
-
-// Calculate the height of the title block and update the Y position
-$title_bbox = imagettfbbox($title_font_size, 0, $font_bold_path, $wrapped_title);
-$y_pos += abs($title_bbox[7] - $title_bbox[1]); // Add the height of the title text
-
-// --- Date & Time ---
-$y_pos += 50; // Add space before the details
 $details_font_size = 42;
-imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_accent_random, $font_bold_path, $date_formatted);
-$y_pos += 70;
-imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_text_light, $font_regular_path, $time_string);
-$y_pos += 70;
-imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_text_light, $font_regular_path, $location);
+$desc_font_size = 32;
 
-// --- Description ---
-if (!empty($description)) {
-    $y_pos += 60; // Space before separator line
-    // Draw a separator line
-    imageline($image, $padding, $y_pos, $width - $padding, $y_pos, $color_text_medium);
-    $y_pos += 40; // Space after separator line
+
+// --- TEMPLATE LOGIC ---
+
+if ($selected_template == 1) { // Template 1: Classic
+    $y_pos += 80; // Space after logo/tagline
+
+    // --- Title ---
+    $wrapped_title = wrap_text($title_font_size, 0, $font_bold_path, $title, $width - ($padding * 2));
+    imagettftext($image, $title_font_size, 0, $padding, $y_pos, $color_text_light, $font_bold_path, $wrapped_title);
+    $title_bbox = imagettfbbox($title_font_size, 0, $font_bold_path, $wrapped_title);
+    $y_pos += abs($title_bbox[7] - $title_bbox[1]);
+
+    // --- Date & Time & Location ---
+    $y_pos += 50;
+    imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_accent, $font_bold_path, $date_formatted);
+    $y_pos += 70;
+    imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_text_light, $font_regular_path, $time_string);
+    $y_pos += 70;
+    imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_text_light, $font_regular_path, $location);
+
+    // --- Description ---
+    if (!empty($description)) {
+        $y_pos += 60;
+        imageline($image, $padding, $y_pos, $width - $padding, $y_pos, $color_text_medium);
+        $y_pos += 40;
+        $wrapped_desc = wrap_text($desc_font_size, 0, $font_regular_path, $description, $width - ($padding * 2));
+        imagettftext($image, $desc_font_size, 0, $padding, $y_pos, $color_text_medium, $font_regular_path, $wrapped_desc);
+    }
+
+} elseif ($selected_template == 2) { // Template 2: Bottom-Title
+    $y_pos += 60; // Space after logo/tagline
+
+    // --- Date & Time & Location (Top) ---
+    imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_accent, $font_bold_path, $date_formatted);
+    $y_pos += 70;
+    imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_text_light, $font_regular_path, $time_string);
+    $y_pos += 70;
+    imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_text_light, $font_regular_path, $location);
+
+    // --- Description (Middle) ---
+    if (!empty($description)) {
+        $y_pos += 60;
+        imageline($image, $padding, $y_pos, $width - $padding, $y_pos, $color_text_medium);
+        $y_pos += 40;
+        $wrapped_desc = wrap_text($desc_font_size, 0, $font_regular_path, $description, $width - ($padding * 2));
+        imagettftext($image, $desc_font_size, 0, $padding, $y_pos, $color_text_medium, $font_regular_path, $wrapped_desc);
+        $desc_bbox = imagettfbbox($desc_font_size, 0, $font_regular_path, $wrapped_desc);
+        $y_pos += abs($desc_bbox[7] - $desc_bbox[1]);
+    }
+
+    // --- Title (Bottom, above footer) ---
+    $title_y_pos = $height - $padding - 150; // Positioned from bottom, adjust 150 based on SCEA logo and desired spacing
+    $wrapped_title = wrap_text($title_font_size, 0, $font_bold_path, $title, $width - ($padding * 2));
+    $title_bbox = imagettfbbox($title_font_size, 0, $font_bold_path, $wrapped_title);
+    $title_actual_height = abs($title_bbox[7] - $title_bbox[1]);
+    // Adjust Y to make sure the entire title block is visible and centered in its allocated space
+    $title_y_pos = $title_y_pos - $title_actual_height;
+    imagettftext($image, $title_font_size, 0, $padding, $title_y_pos, $color_text_light, $font_bold_path, $wrapped_title);
+
+
+} elseif ($selected_template == 3) { // Template 3: Side-Banner
+    // Banner on the left side
+    $banner_width = 350;
+    imagefilledrectangle($image, 0, 0, $banner_width, $height, $color_accent);
+
+    // Reset y_pos for content within the banner
+    $y_banner_pos = $padding;
+
+    // --- Date & Time & Location (In Banner) ---
+    $details_font_size_banner = 38;
+    $banner_text_color = imagecolorallocate($image, 255, 255, 255); // White text for banner
+
+    $wrapped_date_banner = wrap_text($details_font_size_banner, 0, $font_bold_path, $date_formatted, $banner_width - ($padding / 2));
+    imagettftext($image, $details_font_size_banner, 0, $padding / 2, $y_banner_pos, $banner_text_color, $font_bold_path, $wrapped_date_banner);
+    $date_bbox_banner = imagettfbbox($details_font_size_banner, 0, $font_bold_path, $wrapped_date_banner);
+    $y_banner_pos += abs($date_bbox_banner[7] - $date_bbox_banner[1]) + 40;
+
+    $wrapped_time_banner = wrap_text($details_font_size_banner, 0, $font_regular_path, $time_string, $banner_width - ($padding / 2));
+    imagettftext($image, $details_font_size_banner, 0, $padding / 2, $y_banner_pos, $banner_text_color, $font_regular_path, $wrapped_time_banner);
+    $time_bbox_banner = imagettfbbox($details_font_size_banner, 0, $font_regular_path, $wrapped_time_banner);
+    $y_banner_pos += abs($time_bbox_banner[7] - $time_bbox_banner[1]) + 40;
+
+    $wrapped_location_banner = wrap_text($details_font_size_banner, 0, $font_regular_path, $location, $banner_width - ($padding / 2));
+    imagettftext($image, $details_font_size_banner, 0, $padding / 2, $y_banner_pos, $banner_text_color, $font_regular_path, $wrapped_location_banner);
+
+
+    // Content to the right of the banner (Title, Description, Logo)
+    $content_x_offset = $banner_width + $padding;
+    $content_width = $width - $content_x_offset - $padding;
     
-    $desc_font_size = 32;
-    $wrapped_desc = wrap_text($desc_font_size, 0, $font_regular_path, $description, $width - ($padding * 2));
-    imagettftext($image, $desc_font_size, 0, $padding, $y_pos, $color_text_medium, $font_regular_path, $wrapped_desc);
+    // y_pos for this section is already set after logo drawing.
+    // The logo is positioned to the right in this template. $y_pos is below the logo.
+    $y_pos_main_content = $padding; // Start from top for this column, logo will be placed by its own logic.
+
+    // --- Title (Right of Banner) ---
+    // The common logo drawing code updates $y_pos. For template 3, $y_pos is effectively the starting Y for content next to the banner,
+    // but it's calculated based on being *under* the logo in that right-hand column.
+    // $y_pos from common logo section for template 3 is: $padding (top of logo) + $new_logo_h + space_after_logo + tagline_height + space_after_tagline
+    // This is the correct starting point for the title in the right column.
+    // Let's ensure $y_pos is correctly reflecting the position *below* the logo and tagline in the right column.
+    // The common logo code for template 3 sets: $y_pos = $padding + $new_logo_h + 50; (after logo)
+    // Then tagline is drawn. We need to use the $y_pos that was set in the common logo section.
+    // $y_pos is globally updated after logo + tagline, so it should be correct here.
+
+    $title_font_size_main = 60;
+    $wrapped_title_main = wrap_text($title_font_size_main, 0, $font_bold_path, $title, $content_width);
+    imagettftext($image, $title_font_size_main, 0, $content_x_offset, $y_pos_main_content, $color_text_light, $font_bold_path, $wrapped_title_main);
+    $title_bbox_main = imagettfbbox($title_font_size_main, 0, $font_bold_path, $wrapped_title_main);
+    $y_pos_main_content += abs($title_bbox_main[7] - $title_bbox_main[1]);
+
+    // --- Description (Right of Banner) ---
+    if (!empty($description)) {
+        $y_pos_main_content += 40;
+        imageline($image, $content_x_offset, $y_pos_main_content, $width - $padding, $y_pos_main_content, $color_text_medium);
+        $y_pos_main_content += 30;
+        $desc_font_size_main = 28;
+        $wrapped_desc_main = wrap_text($desc_font_size_main, 0, $font_regular_path, $description, $content_width);
+        imagettftext($image, $desc_font_size_main, 0, $content_x_offset, $y_pos_main_content, $color_text_medium, $font_regular_path, $wrapped_desc_main);
+    }
 }
 
-// --- Footer ---
+
+// --- Footer (Common to all templates, but position might vary slightly if template 3 banner is too tall) ---
 $scea_logo_url = 'https://images.squarespace-cdn.com/content/v1/5b5776b2af20962f0511952c/e6e59ae4-1fb2-4679-8f03-4da69779a43c/SCEAlogo300dpiPRINT.png?format=1500w';
 // Use @ to suppress warnings if the URL is inaccessible
 $scea_logo_img = @imagecreatefrompng($scea_logo_url);

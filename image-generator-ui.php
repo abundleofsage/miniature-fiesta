@@ -61,21 +61,48 @@ foreach ($upcoming_events as $event) {
                             <?php foreach ($events as $event): ?>
                                 <?php
                                     $event_date = $event['date'];
-                                    $image_url = "generate-post-image.php?date=" . urlencode($event_date);
+                                    // Base image URL
+                                    $base_image_url = "generate-post-image.php?date=" . urlencode($event_date);
                                     // Sanitize summary for the filename
                                     $filename_summary = strtolower(preg_replace('/[^a-zA-Z0-9\-]/', '', str_replace(' ', '-', $event['summary'])));
-                                    $download_filename = "outfront-post-{$event_date}-{$filename_summary}.png";
+                                    $download_filename_base = "outfront-post-{$event_date}-{$filename_summary}";
                                 ?>
-                                <div class="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div class="bg-gray-800 rounded-lg p-6 shadow-lg event-card space-y-4" data-event-date="<?php echo urlencode($event_date); ?>" data-filename-base="<?php echo $download_filename_base; ?>">
                                     <div class="flex-grow text-center md:text-left">
-                                        <p class="font-bold text-lg text-white"><?php echo htmlspecialchars($event['summary']); ?></p>
-                                        <p class="text-gray-400 text-sm"><?php echo date('l, F jS', strtotime($event_date)); ?></p>
+                                        <p class="font-bold text-xl text-white"><?php echo htmlspecialchars($event['summary']); ?></p>
+                                        <p class="text-gray-400 text-md"><?php echo date('l, F jS', strtotime($event_date)); ?></p>
                                     </div>
-                                    <div class="flex items-center gap-4 flex-shrink-0">
-                                        <a href="<?php echo $image_url; ?>" target="_blank" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="template-select-<?php echo $event_date; ?>" class="block text-sm font-medium text-gray-300 mb-1">Template:</label>
+                                            <select id="template-select-<?php echo $event_date; ?>" name="template" class="template-select bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5">
+                                                <option value="1" selected>Classic</option>
+                                                <option value="2">Bottom Title</option>
+                                                <option value="3">Side Banner</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="color-select-<?php echo $event_date; ?>" class="block text-sm font-medium text-gray-300 mb-1">Accent Color:</label>
+                                            <select id="color-select-<?php echo $event_date; ?>" name="accent_color" class="color-select bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5">
+                                                <option value="">Random (Default)</option>
+                                                <option value="EC4899">Hot Pink</option>
+                                                <option value="34D399">Bright Teal</option>
+                                                <option value="FBBF24">Bright Amber</option>
+                                                <option value="8B5CF6">Bright Violet</option>
+                                                <option value="F97316">Bright Orange</option>
+                                                <option value="EF4444">Red</option>
+                                                <option value="3B82F6">Blue</option>
+                                                <option value="10B981">Green</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-4 flex-shrink-0 pt-2">
+                                        <a href="<?php echo $base_image_url; ?>" target="_blank" class="preview-link bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 w-full text-center md:w-auto">
                                             Preview
                                         </a>
-                                        <a href="<?php echo $image_url; ?>" download="<?php echo $download_filename; ?>" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+                                        <a href="<?php echo $base_image_url; ?>" download="<?php echo $download_filename_base . ".png"; ?>" class="download-link bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 w-full text-center md:w-auto">
                                             Download
                                         </a>
                                     </div>
@@ -93,5 +120,48 @@ foreach ($upcoming_events as $event) {
 
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const eventCards = document.querySelectorAll('.event-card');
+
+            eventCards.forEach(card => {
+                const templateSelect = card.querySelector('.template-select');
+                const colorSelect = card.querySelector('.color-select');
+                const previewLink = card.querySelector('.preview-link');
+                const downloadLink = card.querySelector('.download-link');
+                const eventDate = card.dataset.eventDate;
+                const filenameBase = card.dataset.filenameBase;
+
+                function updateLinks() {
+                    const selectedTemplate = templateSelect.value;
+                    const selectedColor = colorSelect.value;
+
+                    let baseUrl = `generate-post-image.php?date=${eventDate}`;
+                    let newFilename = `${filenameBase}`;
+
+                    if (selectedTemplate) {
+                        baseUrl += `&template=${selectedTemplate}`;
+                        newFilename += `-template${selectedTemplate}`;
+                    }
+                    if (selectedColor) {
+                        baseUrl += `&accent_color=${selectedColor}`;
+                        newFilename += `-color${selectedColor}`;
+                    }
+
+                    newFilename += '.png';
+
+                    previewLink.href = baseUrl;
+                    downloadLink.href = baseUrl;
+                    downloadLink.download = newFilename;
+                }
+
+                templateSelect.addEventListener('change', updateLinks);
+                colorSelect.addEventListener('change', updateLinks);
+
+                // Initial call to set links based on default selections
+                updateLinks();
+            });
+        });
+    </script>
 </body>
 </html>
