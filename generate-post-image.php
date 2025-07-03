@@ -120,7 +120,7 @@ if ($target_event === null) {
 
 // 1. Setup Canvas
 $width = 1200;
-$height = 1300;
+$height = 1200;
 $image = imagecreatetruecolor($width, $height);
 $padding = 80;
 
@@ -311,7 +311,9 @@ if ($selected_template == 1) { // Template 1: Classic
     
     // y_pos for this section is already set after logo drawing.
     // The logo is positioned to the right in this template. $y_pos is below the logo.
+   
     // $y_pos is now correctly set globally to be after the tagline in the right column (or default if no logo).
+    $y_pos += 60;
     $y_pos_main_content = $y_pos; // Use the globally updated y_pos as the starting point for the title.
 
     // --- Title (Right of Banner) ---
