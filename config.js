@@ -73,5 +73,5 @@ const config = {
     ],
 
     // --- Easter Egg Configuration ---
-    konamiLogoUrl: "bubble-bobble.png" // Image used for the Konami code easter egg. Can be a local path or a full URL.
+    konamiLogoUrl: "https://images.squarespace-cdn.com/content/v1/5b5776b2af20962f0511952c/e6e59ae4-1fb2-4679-8f03-4da69779a43c/SCEAlogo300dpiPRINT.png?format=1500w" // Image used for the Konami code easter egg. Can be a local path or a full URL.
 };
