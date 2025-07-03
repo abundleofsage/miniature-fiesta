@@ -262,14 +262,19 @@ if ($selected_template == 1) { // Template 1: Classic
     }
 
     // --- Title (Bottom, above footer) ---
-    $title_y_pos = $height - $padding - 150; // Positioned from bottom, adjust 150 based on SCEA logo and desired spacing
-    $wrapped_title = wrap_text($title_font_size, 0, $font_bold_path, $title, $width - ($padding * 2));
-    $title_bbox = imagettfbbox($title_font_size, 0, $font_bold_path, $wrapped_title);
-    $title_actual_height = abs($title_bbox[7] - $title_bbox[1]);
-    // Adjust Y to make sure the entire title block is visible and centered in its allocated space
-    $title_y_pos = $title_y_pos - $title_actual_height;
-    imagettftext($image, $title_font_size, 0, $padding, $title_y_pos, $color_text_light, $font_bold_path, $wrapped_title);
+    // The following lines for drawing the title are commented out for Template 2
+    // $title_y_pos = $height - $padding - 150; // Positioned from bottom, adjust 150 based on SCEA logo and desired spacing
+    // $wrapped_title = wrap_text($title_font_size, 0, $font_bold_path, $title, $width - ($padding * 2));
+    // $title_bbox = imagettfbbox($title_font_size, 0, $font_bold_path, $wrapped_title);
+    // $title_actual_height = abs($title_bbox[7] - $title_bbox[1]);
+    // // Adjust Y to make sure the entire title block is visible and centered in its allocated space
+    // $title_y_pos = $title_y_pos - $title_actual_height;
+    // imagettftext($image, $title_font_size, 0, $padding, $title_y_pos, $color_text_light, $font_bold_path, $wrapped_title);
 
+    // Since title is removed, we might want to ensure description takes up available space or adjust other elements.
+    // For now, removing the title is the primary change.
+    // If the description was the last element, its y_pos would determine the bottom of the content.
+    // The footer SCEA logo is positioned from the bottom of the image, so it's not directly dependent on text flow from above in this template.
 
 } elseif ($selected_template == 3) { // Template 3: Side-Banner
     // Banner on the left side
