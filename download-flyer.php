@@ -80,7 +80,7 @@ class PDF extends FPDF {
         $this->SetFont('Helvetica', '', 11);
         $this->Ln(15); 
 		$this->SetFillColor(230);
-        $this->MultiCell(142, 6, 'Looking for a supportive community? Outfront is a welcoming and fun group for LGBTQ+ youth and allies (ages 13-20) to connect, share experiences, and build friendships. Groups are confidential. What\'s shared here stays here. Join us!', 1, 'C', true);
+        $this->MultiCell(142, 6, 'Looking for a supportive community? OutFront is a welcoming and fun group for LGBTQ+ youth and allies (ages 13-20) to connect, share experiences, and build friendships. Groups are confidential. What\'s shared here stays here. Join us!', 1, 'C', true);
 
         $this->SetFont('Helvetica', 'B', 10);
         $this->Ln(2); 
@@ -122,7 +122,7 @@ function Footer() {
     
     // SCEA Affiliation (most important info, bold)
     $this->SetFont('Helvetica', 'B', 9);
-    $this->Cell(0, 5, "Outfront is a program of the Southern Colorado Equality Alliance", 0, 2, 'R', false, 'https://www.socoequality.org/outfront');
+    $this->Cell(0, 5, "OutFront is a program of the Southern Colorado Equality Alliance", 0, 2, 'R', false, 'https://www.socoequality.org/outfront');
     
     // Friendly closing message
     $this->SetFont('Helvetica', '', 8);
@@ -132,31 +132,6 @@ function Footer() {
     $this->SetFont('Helvetica', 'I', 7); 
     $this->Cell(0, 5, "Flyer ID: outfront-flyer-" . strtolower($this->month_name_display) . '-' . $this->year_display, 0, 0, 'R');
 }
-
-    
-/*    function Footer() {
-        $this->SetY(-35);
-        if ($this->fb_qr_code_image_url && @getimagesize($this->fb_qr_code_image_url)) {
-            $this->Image($this->fb_qr_code_image_url, 15, $this->GetY() - 2, 15, 15, 'PNG', 'https://facebook.com/outfrontyouth');
-        }
-        $this->SetFont('Helvetica','B',9);
-        $this->SetX(32);
-        $this->Cell(0,5,"Find us on Facebook!",0,1);
-        $this->SetFont('Helvetica','',9);
-        $this->SetX(32);
-        $this->Cell(0,5,"facebook.com/outfrontyouth",0,1);
-        $this->SetFont('Helvetica','B',12);
-        $this->SetY(-35);
-        $this->Cell(0,5,"Check back next month for more fun!",0,1,'R');
-        $this->SetFont('Helvetica','B',9);
-        $this->SetY(-25);
-        $this->Cell(0,5,"Outfront is a program of the Southern Colorado Equality Alliance",0,1,'R',0,'https://www.socoequality.org/outfront');
-	$this->Ln(2);
-        $this->SetFont('Helvetica','',8);
-	//$this->Cell(0,5,"outfront-flyer-" . strtolower($this->month_name_display) . '-' . $this->year_display;,0,1,'R')
-	$this->Cell(0, 5, "ID: outfront-flyer-" . strtolower($this->month_name_display) . '-' . $this->year_display, 0, 1, 'R');
-    }
-*/
 }
 
 $pdf = new PDF();
@@ -165,8 +140,8 @@ $pdf->qr_code_image_url = $qr_code_image_url;
 $pdf->fb_qr_code_image_url = $fb_qr_code_image_url;
 $pdf->month_name_display = $month_name_display;
 $pdf->year_display = $year;
-$pdf->SetTitle('Outfront Flyer - ' . $month_name_display . ' ' . $year);
-$pdf->SetAuthor('Outfront Youth Group');
+$pdf->SetTitle('OutFront Flyer - ' . $month_name_display . ' ' . $year);
+$pdf->SetAuthor('OutFront Youth Group');
 $pdf->SetMargins(15, 17, 15);
 $pdf->AddPage();
 

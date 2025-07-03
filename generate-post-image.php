@@ -360,7 +360,7 @@ if ($scea_logo_img) {
     imagedestroy($scea_logo_img);
 } else {
     // Fallback to text if the logo can't be loaded for any reason
-    $footer_text = "Outfront is a program of the Southern Colorado Equality Alliance";
+    $footer_text = "OutFront is a program of the Southern Colorado Equality Alliance";
     imagettftext($image, 20, 0, $padding, $height - $padding, $color_text_medium, $font_regular_path, $footer_text);
 }
 
