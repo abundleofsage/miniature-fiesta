@@ -187,10 +187,13 @@ if (file_exists($logo_path)) {
     imagettftext($image, $tagline_font_size, 0, $tagline_x, $tagline_y_pos, $color_text_medium, $font_regular_path, $tagline_text);
 
     if ($selected_template != 3) { // For template 1 and 2, tagline pushes main content down
-         $y_pos = $tagline_y_pos + abs($tagline_bbox[7] - $tagline_bbox[1]);
-    } else { // For template 3, tagline is alongside, so y_pos for main content is different
-        $y_pos = $padding + $new_logo_h + 50; // Reset y_pos for main content area
+         $y_pos = $tagline_y_pos + abs($tagline_bbox[7] - $tagline_bbox[1]); // y_pos is now below tagline
+    } else { // For template 3, tagline is in the right column, under its logo.
+        // $y_pos should be set to be below the tagline in the right-hand column.
+        $y_pos = $tagline_y_pos + abs($tagline_bbox[7] - $tagline_bbox[1]) + 30; // Add 30px padding below tagline
     }
+} else { // If logo file doesn't exist, set a default starting y_pos
+    $y_pos = $padding;
 }
 
 
@@ -308,17 +311,11 @@ if ($selected_template == 1) { // Template 1: Classic
     
     // y_pos for this section is already set after logo drawing.
     // The logo is positioned to the right in this template. $y_pos is below the logo.
-    $y_pos_main_content = $padding; // Start from top for this column, logo will be placed by its own logic.
+    // $y_pos is now correctly set globally to be after the tagline in the right column (or default if no logo).
+    $y_pos_main_content = $y_pos; // Use the globally updated y_pos as the starting point for the title.
 
     // --- Title (Right of Banner) ---
-    // The common logo drawing code updates $y_pos. For template 3, $y_pos is effectively the starting Y for content next to the banner,
-    // but it's calculated based on being *under* the logo in that right-hand column.
-    // $y_pos from common logo section for template 3 is: $padding (top of logo) + $new_logo_h + space_after_logo + tagline_height + space_after_tagline
-    // This is the correct starting point for the title in the right column.
-    // Let's ensure $y_pos is correctly reflecting the position *below* the logo and tagline in the right column.
-    // The common logo code for template 3 sets: $y_pos = $padding + $new_logo_h + 50; (after logo)
-    // Then tagline is drawn. We need to use the $y_pos that was set in the common logo section.
-    // $y_pos is globally updated after logo + tagline, so it should be correct here.
+    // $y_pos_main_content is already set to be below the logo and tagline.
 
     $title_font_size_main = 60;
     $wrapped_title_main = wrap_text($title_font_size_main, 0, $font_bold_path, $title, $content_width);
@@ -328,9 +325,9 @@ if ($selected_template == 1) { // Template 1: Classic
 
     // --- Description (Right of Banner) ---
     if (!empty($description)) {
-        $y_pos_main_content += 40;
+        $y_pos_main_content += 40; // Add space between title and description separator
         imageline($image, $content_x_offset, $y_pos_main_content, $width - $padding, $y_pos_main_content, $color_text_medium);
-        $y_pos_main_content += 30;
+        $y_pos_main_content += 30; // Add space after separator line
         $desc_font_size_main = 28;
         $wrapped_desc_main = wrap_text($desc_font_size_main, 0, $font_regular_path, $description, $content_width);
         imagettftext($image, $desc_font_size_main, 0, $content_x_offset, $y_pos_main_content, $color_text_medium, $font_regular_path, $wrapped_desc_main);
