@@ -95,9 +95,48 @@
         .interactive-card:hover {
             transform: rotate(-2deg) scale(1.02);
         }
+
+        /* Konami Code Easter Egg Animation */
+        #konami-logo {
+            position: fixed;
+            top: 50%;
+            left: -200px; /* Start off-screen */
+            transform: translateY(-50%);
+            width: 150px;
+            height: auto;
+            z-index: 9999;
+            display: none; /* Hidden by default */
+            animation: konami-animation 5s linear forwards;
+        }
+
+        @keyframes konami-animation {
+            0% {
+                left: -200px;
+                transform: translateY(-50%) rotate(0deg);
+            }
+            25% {
+                left: calc(50% - 75px); /* Move to center */
+                transform: translateY(-50%) rotate(360deg);
+            }
+            50% {
+                left: calc(50% - 75px);
+                transform: translateY(-50%) rotate(720deg) scale(5); /* Spin and grow */
+            }
+            75% {
+                left: calc(50% - 75px);
+                transform: translateY(-50%) rotate(1080deg) scale(1); /* Spin and shrink back */
+            }
+            100% {
+                left: calc(100% + 200px); /* Move off-screen to the right */
+                transform: translateY(-50%) rotate(1440deg);
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
+
+    <!-- Konami Code Easter Egg Element -->
+    <img src="outfront-logo.png" alt="OutFront Logo" id="konami-logo">
 
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md">
@@ -644,6 +683,50 @@
                 generateResources(config.fallbackResources);
             }
         };
+
+        // --- KONAMI CODE EASTER EGG ---
+        const konamiCode = [
+            'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight'
+        ];
+        let konamiIndex = 0;
+        let animationTimeout;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    konamiIndex = 0; // Reset for next time
+                    const logo = document.getElementById('konami-logo');
+
+                    // Set the logo image source from config
+                    if (config && config.konamiLogoUrl) {
+                        logo.src = config.konamiLogoUrl;
+                    } else {
+                        logo.src = 'outfront-logo.png'; // Fallback if not defined
+                    }
+
+                    // Clear any existing animation timeout
+                    if (animationTimeout) {
+                        clearTimeout(animationTimeout);
+                    }
+
+                    // Reset animation by removing and re-adding the class/style
+                    logo.style.animation = 'none'; // Temporarily remove animation
+                    logo.offsetHeight; // Trigger reflow
+                    logo.style.animation = ''; // Re-add animation from CSS
+
+                    logo.style.display = 'block'; // Show the logo
+
+                    // Set a timeout to hide the logo after the animation completes (5s)
+                    animationTimeout = setTimeout(() => {
+                        logo.style.display = 'none';
+                    }, 5000);
+                }
+            } else {
+                konamiIndex = 0; // Reset if wrong key is pressed
+            }
+        });
     </script>
 </body>
 </html>
