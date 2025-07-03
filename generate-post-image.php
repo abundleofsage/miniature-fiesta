@@ -227,11 +227,11 @@ if ($selected_template == 1) { // Template 1: Classic
     $y_pos += abs($title_bbox[7] - $title_bbox[1]);
 
     // --- Date & Time & Location ---
-    $y_pos += 50;
+    $y_pos += 40;
     imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_accent, $font_bold_path, $date_formatted);
-    $y_pos += 70;
+    $y_pos += 60;
     imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_text_light, $font_regular_path, $time_string);
-    $y_pos += 70;
+    $y_pos += 60;
     imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_text_light, $font_regular_path, $location);
 
     // --- Description ---
