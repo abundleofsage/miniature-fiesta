@@ -28,7 +28,7 @@ foreach ($upcoming_events as $event) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Outfront Post Image Generator</title>
+    <title>OutFront Post Image Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -115,7 +115,7 @@ foreach ($upcoming_events as $event) {
         </main>
 
         <footer class="text-center mt-12 text-gray-500">
-            <p>&copy; <?php echo date('Y'); ?> Outfront Youth Group</p>
+            <p>&copy; <?php echo date('Y'); ?> OutFront Youth Group</p>
         </footer>
 
     </div>

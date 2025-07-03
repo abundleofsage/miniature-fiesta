@@ -1,5 +1,5 @@
 // ===================================================================
-// === Outfront Website Configuration File                         ===
+// === OutFront Website Configuration File                         ===
 // ===================================================================
 // This file contains all the key information that might change over time.
 // Edit the values here to update the website without touching the main HTML.
