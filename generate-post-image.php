@@ -236,7 +236,7 @@ if ($selected_template == 1) { // Template 1: Classic
 
     // --- Description ---
     if (!empty($description)) {
-        $y_pos += 60;
+        $y_pos += 50;
         imageline($image, $padding, $y_pos, $width - $padding, $y_pos, $color_text_medium);
         $y_pos += 40;
         $wrapped_desc = wrap_text($desc_font_size, 0, $font_regular_path, $description, $width - ($padding * 2));
@@ -244,7 +244,7 @@ if ($selected_template == 1) { // Template 1: Classic
     }
 
 } elseif ($selected_template == 2) { // Template 2: Bottom-Title
-    $y_pos += 60; // Space after logo/tagline
+    $y_pos += 90; // Space after logo/tagline
 
     // --- Date & Time & Location (Top) ---
     imagettftext($image, $details_font_size, 0, $padding, $y_pos, $color_accent, $font_bold_path, $date_formatted);
