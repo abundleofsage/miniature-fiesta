@@ -218,7 +218,7 @@ $desc_font_size = 32;
 // --- TEMPLATE LOGIC ---
 
 if ($selected_template == 1) { // Template 1: Classic
-    $y_pos += 80; // Space after logo/tagline
+    $y_pos += 60; // Space after logo/tagline
 
     // --- Title ---
     $wrapped_title = wrap_text($title_font_size, 0, $font_bold_path, $title, $width - ($padding * 2));
