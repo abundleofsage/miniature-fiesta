@@ -76,6 +76,7 @@ foreach ($upcoming_events as $event) {
                             <span class="ml-2">Use Color Logo</span>
                         </label>
                     </div>
+                    <p class="text-sm text-gray-400 pt-1">Flyer generation may take a few moments. Please click once and wait.</p>
                     <div class="flex items-center gap-4 flex-shrink-0 pt-2">
                         <a href="#" id="flyer-download-pdf-link" target="_blank" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 w-full text-center md:w-auto">
                             Download PDF
