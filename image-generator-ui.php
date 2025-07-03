@@ -48,15 +48,54 @@ foreach ($upcoming_events as $event) {
         </header>
 
         <main class="space-y-12">
+            <section>
+                <h2 class="text-2xl font-bold text-sky-500 border-b-2 border-gray-700 pb-2 mb-6">Monthly Flyer Generator</h2>
+                <div class="bg-gray-800 rounded-lg p-6 shadow-lg space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="flyer-month-select" class="block text-sm font-medium text-gray-300 mb-1">Month:</label>
+                            <select id="flyer-month-select" name="flyer_month" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                <?php
+                                    for ($m = 1; $m <= 12; $m++) {
+                                        $month_value = strtolower(date('F', mktime(0, 0, 0, $m, 1)));
+                                        $month_display = date('F', mktime(0, 0, 0, $m, 1));
+                                        $selected = (strtolower(date('F')) == $month_value) ? 'selected' : '';
+                                        echo "<option value=\"$month_value\" $selected>$month_display</option>";
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="flyer-year-input" class="block text-sm font-medium text-gray-300 mb-1">Year:</label>
+                            <input type="number" id="flyer-year-input" name="flyer_year" value="<?php echo date('Y'); ?>" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="flyer-color-logo-toggle" class="flex items-center cursor-pointer text-sm text-gray-300">
+                            <input type="checkbox" id="flyer-color-logo-toggle" class="form-checkbox h-4 w-4 text-sky-500 bg-gray-700 border-gray-600 rounded focus:ring-sky-500">
+                            <span class="ml-2">Use Color Logo</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-4 flex-shrink-0 pt-2">
+                        <a href="#" id="flyer-download-pdf-link" target="_blank" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 w-full text-center md:w-auto">
+                            Download PDF
+                        </a>
+                        <a href="#" id="flyer-download-png-link" target="_blank" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 w-full text-center md:w-auto">
+                            Download PNG
+                        </a>
+                    </div>
+                </div>
+            </section>
+
             <?php if (empty($events_by_month)): ?>
                 <div class="bg-gray-800 rounded-lg p-8 text-center">
-                    <h2 class="text-2xl font-bold text-white">No Upcoming Events Found</h2>
-                    <p class="text-gray-400 mt-2">Check the iCal feed or add new events to the calendar.</p>
+                    <h2 class="text-2xl font-bold text-white">No Upcoming Event Post Images Found</h2>
+                    <p class="text-gray-400 mt-2">Check the iCal feed or add new events to the calendar for individual post images.</p>
                 </div>
             <?php else: ?>
                 <?php foreach ($events_by_month as $month => $events): ?>
                     <section>
-                        <h2 class="text-2xl font-bold text-pink-500 border-b-2 border-gray-700 pb-2 mb-6"><?php echo $month; ?></h2>
+                        <h2 class="text-2xl font-bold text-pink-500 border-b-2 border-gray-700 pb-2 mb-6">Upcoming Event Posts for <?php echo $month; ?></h2>
                         <div class="space-y-4">
                             <?php foreach ($events as $event): ?>
                                 <?php
@@ -122,8 +161,8 @@ foreach ($upcoming_events as $event) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Event post image generator logic
             const eventCards = document.querySelectorAll('.event-card');
-
             eventCards.forEach(card => {
                 const templateSelect = card.querySelector('.template-select');
                 const colorSelect = card.querySelector('.color-select');
@@ -132,13 +171,11 @@ foreach ($upcoming_events as $event) {
                 const eventDate = card.dataset.eventDate;
                 const filenameBase = card.dataset.filenameBase;
 
-                function updateLinks() {
+                function updateEventPostLinks() {
                     const selectedTemplate = templateSelect.value;
                     const selectedColor = colorSelect.value;
-
                     let baseUrl = `generate-post-image.php?date=${eventDate}`;
                     let newFilename = `${filenameBase}`;
-
                     if (selectedTemplate) {
                         baseUrl += `&template=${selectedTemplate}`;
                         newFilename += `-template${selectedTemplate}`;
@@ -147,20 +184,46 @@ foreach ($upcoming_events as $event) {
                         baseUrl += `&accent_color=${selectedColor}`;
                         newFilename += `-color${selectedColor}`;
                     }
-
                     newFilename += '.png';
-
                     previewLink.href = baseUrl;
                     downloadLink.href = baseUrl;
                     downloadLink.download = newFilename;
                 }
 
-                templateSelect.addEventListener('change', updateLinks);
-                colorSelect.addEventListener('change', updateLinks);
-
-                // Initial call to set links based on default selections
-                updateLinks();
+                if (templateSelect && colorSelect && previewLink && downloadLink) {
+                    templateSelect.addEventListener('change', updateEventPostLinks);
+                    colorSelect.addEventListener('change', updateEventPostLinks);
+                    updateEventPostLinks(); // Initial call
+                }
             });
+
+            // Monthly flyer generator logic
+            const flyerMonthSelect = document.getElementById('flyer-month-select');
+            const flyerYearInput = document.getElementById('flyer-year-input');
+            const flyerColorLogoToggle = document.getElementById('flyer-color-logo-toggle');
+            const flyerDownloadPdfLink = document.getElementById('flyer-download-pdf-link');
+            const flyerDownloadPngLink = document.getElementById('flyer-download-png-link');
+
+            function updateFlyerDownloadLinks() {
+                const month = flyerMonthSelect.value;
+                const year = flyerYearInput.value;
+                const color = flyerColorLogoToggle.checked;
+
+                const pdfUrl = `download-flyer.php?month=${month}&year=${year}${color ? '&color=true' : ''}`;
+                flyerDownloadPdfLink.href = pdfUrl;
+                flyerDownloadPdfLink.download = `outfront-flyer-${month}-${year}${color ? '-color' : ''}.pdf`;
+
+                const pngUrl = `generate-flyer-image.php?month=${month}&year=${year}${color ? '&color=true' : ''}`;
+                flyerDownloadPngLink.href = pngUrl;
+                flyerDownloadPngLink.download = `outfront-flyer-${month}-${year}${color ? '-color' : ''}.png`;
+            }
+
+            if (flyerMonthSelect && flyerYearInput && flyerColorLogoToggle && flyerDownloadPdfLink && flyerDownloadPngLink) {
+                flyerMonthSelect.addEventListener('change', updateFlyerDownloadLinks);
+                flyerYearInput.addEventListener('input', updateFlyerDownloadLinks); // Use input for number field
+                flyerColorLogoToggle.addEventListener('change', updateFlyerDownloadLinks);
+                updateFlyerDownloadLinks(); // Initial call
+            }
         });
     </script>
 </body>
