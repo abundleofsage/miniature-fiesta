@@ -63,9 +63,10 @@ try {
     }
 
     $imagick->setIteratorIndex(0); // Select the first page
+    $imagick->setImageBackgroundColor('white'); // Set a white background
+    // Flatten image to apply the background color and remove alpha channel
+    $imagick = $imagick->flattenImages(); // This returns a new Imagick object
     $imagick->setImageFormat('png'); // Set output format to PNG
-    // $imagick->setImageBackgroundColor('white'); // Set a white background if PDF has transparency
-    // $imagick = $imagick->flattenImages(); // Merges layers and removes transparency if needed
 
     // --- Output PNG ---
     $filename_month = strtolower($month_name);
