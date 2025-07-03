@@ -78,7 +78,7 @@ foreach ($upcoming_events as $event) {
                                             <label for="template-select-<?php echo $event_date; ?>" class="block text-sm font-medium text-gray-300 mb-1">Template:</label>
                                             <select id="template-select-<?php echo $event_date; ?>" name="template" class="template-select bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5">
                                                 <option value="1" selected>Classic</option>
-                                                <option value="2">Bottom Title</option>
+                                                <option value="2">No Title</option>
                                                 <option value="3">Side Banner</option>
                                             </select>
                                         </div>
