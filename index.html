@@ -120,7 +120,7 @@
             }
             50% {
                 left: calc(50% - 75px);
-                transform: translateY(-50%) rotate(720deg) scale(4); /* Spin and grow */
+                transform: translateY(-50%) rotate(720deg) scale(1.5); /* Spin and grow */
             }
             75% {
                 left: calc(50% - 75px);
@@ -687,7 +687,7 @@
         // --- KONAMI CODE EASTER EGG ---
         const konamiCode = [
             'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
-            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'
+            'ArrowLeft', 'ArrowRight'
         ];
         let konamiIndex = 0;
         let animationTimeout;
@@ -698,6 +698,13 @@
                 if (konamiIndex === konamiCode.length) {
                     konamiIndex = 0; // Reset for next time
                     const logo = document.getElementById('konami-logo');
+
+                    // Set the logo image source from config
+                    if (config && config.konamiLogoUrl) {
+                        logo.src = config.konamiLogoUrl;
+                    } else {
+                        logo.src = 'outfront-logo.png'; // Fallback if not defined
+                    }
 
                     // Clear any existing animation timeout
                     if (animationTimeout) {

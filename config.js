@@ -70,5 +70,8 @@ const config = {
             description: 'State-level health and wellness information for LGBTQ Coloradans.',
             url: 'https://cdphe.colorado.gov/LGBTQ-health'
         }
-    ]
+    ],
+
+    // --- Easter Egg Configuration ---
+    konamiLogoUrl: "outfront-logo.png" // Image used for the Konami code easter egg. Can be a local path or a full URL.
 };
