@@ -120,7 +120,7 @@ if ($target_event === null) {
 
 // 1. Setup Canvas
 $width = 1200;
-$height = 1300;
+$height = 1200;
 $image = imagecreatetruecolor($width, $height);
 $padding = 80;
 
