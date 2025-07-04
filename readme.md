@@ -83,10 +83,12 @@ All event information for both the interactive web calendar and the downloadable
 *   **To add an event:** Simply create a new event in your Nextcloud calendar that is public or shared on the calendar feed.
 *   **To edit or remove an event:** Just edit or delete the event in Nextcloud.
 
-If you ever need to change the source iCalendar feed itself (e.g., if the Nextcloud calendar URL changes):
-1.  Open **`download-flyer.php`**.
-2.  Find the `$ical_url` variable near the top of the file.
-3.  Replace the existing URL with your new public iCal subscription link.
+If you ever need to change the source iCalendar feed itself (e.g., if the Nextcloud calendar URL changes), you'll need to update it in a few places:
+*   **`download-flyer.php`**: Find the `$ical_url` variable near the top. This URL is used for both PDF flyer generation and for providing JSON event data to the `index.html` calendar.
+*   **`generate-post-image.php`**: Find the `$ical_url` variable near the top. This is used for generating single event post images.
+*   **`image-generator-ui.php`**: Find the `$ical_url` variable near the top. This is used by the UI to list events for image generation.
+
+Remember to use your private Nextcloud iCal subscription link.
 
 ---
 
@@ -100,7 +102,7 @@ The main page (`index.html`) features an interactive calendar:
 *   **Navigation:** Users can move to the previous or next month.
 *   **Event Indicators:** Days with events are highlighted.
 *   **Event Details Modal:** Clicking on a day with events opens a pop-up window showing details for each event on that day (summary, time, location, description).
-*   **Data Source:** Event data is fetched dynamically from `download-flyer.php` (which in turn gets it from your Nextcloud calendar).
+*   **Data Source:** Event data is fetched dynamically by `index.html` by calling `download-flyer.php?json=true`. The `download-flyer.php` script, in turn, uses its defined `$ical_url` to get events from your Nextcloud calendar via `calendar-functions.php`.
 
 #### **B. PDF Event Flyer Generation**
 
@@ -113,7 +115,7 @@ The website can generate a downloadable PDF flyer for any given month's events:
 *   **Logo Choice (New!):** The interactive calendar on `index.html` has a "Use Color Logo on Flyer" checkbox.
     *   If checked, the PDF flyer will use the color `outfront-logo.png`.
     *   If unchecked (default), it will use the `outfront-logo-bw.png`.
-*   **Source:** Event data is pulled from the Nextcloud calendar via the `$ical_url` in `download-flyer.php`.
+*   **Source:** Event data is pulled from the Nextcloud calendar. The `download-flyer.php` script uses its defined `$ical_url` and the `calendar-functions.php` helper script to fetch this data.
 
 #### **C. Image Generation Tools**
 
