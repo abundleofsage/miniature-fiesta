@@ -88,7 +88,6 @@ try {
     echo "Error during PNG generation: " . htmlspecialchars($e->getMessage());
     // If $e is an ImagickException, it might have more specific details,
     // but the main message from getMessage() is usually sufficient.
-    // No standard 'get μπορούσενα' method exists.
     exit;
 }
 

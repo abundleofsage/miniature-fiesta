@@ -3,7 +3,8 @@
 
 // --- ACTION REQUIRED ---
 // Paste your private Nextcloud iCal subscription URL here.
-$ical_url = 'https://cloud.outfrontyouth.org/remote.php/dav/public-calendars/o4BqHRSHaDJjiqjs?export'; // <-- PASTE YOUR URL HERE
+// IMPORTANT: Please verify this is the correct and active iCal URL.
+$ical_url = 'https://cloud.outfrontyouth.org/remote.php/dav/public-calendars/o4BqHRSHaDJjiqjs?export';
 
 // --- Data Fetching and Parsing (Copied from your image generator script) ---
 require_once('calendar-functions.php');
