@@ -1,25 +1,51 @@
 <?php
 // This script provides a user interface to select and download event images.
 
-// --- ACTION REQUIRED ---
-// Paste your private Nextcloud iCal subscription URL here.
-$ical_url = 'https://cloud.outfrontyouth.org/remote.php/dav/public-calendars/o4BqHRSHaDJjiqjs?export'; // <-- PASTE YOUR URL HERE
+require_once('config.php'); // Include the central configuration file
+require_once('calendar-functions.php'); // For app_log, get_calendar_events
 
-// --- Data Fetching and Parsing (Copied from your image generator script) ---
-require_once('calendar-functions.php');
+// $ical_url is now ICAL_URL from config.php
 
 // Get all events and filter for only upcoming ones
-$all_events = get_calendar_events($ical_url);
-$today = date("Y-m-d");
-$upcoming_events = array_filter($all_events, function($event) use ($today) {
-    return strtotime($event['date']) >= strtotime($today);
-});
-usort($upcoming_events, function($a, $b) { return strtotime($a['date']) - strtotime($b['date']); });
+$all_events = get_calendar_events(ICAL_URL); // Use ICAL_URL from config
 
+// Initialize upcoming_events to an empty array to prevent errors if $all_events is false
+$upcoming_events = [];
 $events_by_month = [];
-foreach ($upcoming_events as $event) {
-    $month_year = date('F Y', strtotime($event['date']));
-    $events_by_month[$month_year][] = $event;
+
+if ($all_events === false) {
+    // Log the error. The UI will show "No Upcoming Event Post Images Found" or similar.
+    app_log('ERROR', 'Failed to retrieve calendar events for UI.', ['url' => ICAL_URL]);
+    // $upcoming_events and $events_by_month will remain empty, handled by the UI.
+} else {
+    $today = date("Y-m-d");
+    $upcoming_events = array_filter($all_events, function($event) use ($today) {
+        // Basic check for date existence and validity before calling strtotime
+        if (!isset($event['date'])) return false;
+        $event_timestamp = strtotime($event['date']);
+        if ($event_timestamp === false) {
+            app_log('WARNING', "Invalid date format in event for UI, skipping.", ['event_date' => $event['date'], 'event_summary' => $event['summary'] ?? 'N/A']);
+            return false;
+        }
+        return $event_timestamp >= strtotime($today);
+    });
+    usort($upcoming_events, function($a, $b) {
+        // Add checks for strtotime results if dates can be malformed
+        $timeA = strtotime($a['date']);
+        $timeB = strtotime($b['date']);
+        if ($timeA === false && $timeB === false) return 0;
+        if ($timeA === false) return 1; // Consider malformed dates greater (sorts them to end or beginning)
+        if ($timeB === false) return -1;
+        return $timeA - $timeB;
+    });
+
+    foreach ($upcoming_events as $event) {
+        if (!isset($event['date'])) continue; // Should have been filtered by array_filter already
+        $event_timestamp = strtotime($event['date']);
+        if ($event_timestamp === false) continue; // Skip if somehow still malformed
+        $month_year = date('F Y', $event_timestamp);
+        $events_by_month[$month_year][] = $event;
+    }
 }
 
 ?>
