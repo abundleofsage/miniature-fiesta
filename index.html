@@ -156,6 +156,13 @@
             object-fit: cover; /* Cover the slide area, cropping if necessary */
             display: block;
         }
+        .carousel-slide video {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            display: block;
+        }
         .carousel-button {
             position: absolute;
             top: 50%;
@@ -292,6 +299,18 @@
                             </div>
                             <div class="carousel-slide">
                                 <img src="images/carousel-image-4.jpg" alt="OutFront Youth Group Activity Image 4">
+                            </div>
+                            <div class="carousel-slide">
+                                <video src="https://cloud.outfrontyouth.org/s/dGbswkNrE9nwt5y/preview" controls autoplay muted loop poster="images/video-poster-1.jpg" style="width: 100%; height: auto; max-height: 500px; object-fit: cover;"></video>
+                            </div>
+                            <div class="carousel-slide">
+                                <video src="https://cloud.outfrontyouth.org/s/yzp8rDYdcGo4sG7/preview" controls autoplay muted loop poster="images/video-poster-2.jpg" style="width: 100%; height: auto; max-height: 500px; object-fit: cover;"></video>
+                            </div>
+                            <div class="carousel-slide">
+                                <video src="https://cloud.outfrontyouth.org/s/PQxFjoLmjagpAYM/preview" controls autoplay muted loop poster="images/video-poster-3.jpg" style="width: 100%; height: auto; max-height: 500px; object-fit: cover;"></video>
+                            </div>
+                            <div class="carousel-slide">
+                                <video src="https://cloud.outfrontyouth.org/s/64wkXzbnLaH82HG/preview" controls autoplay muted loop poster="images/video-poster-4.jpg" style="width: 100%; height: auto; max-height: 500px; object-fit: cover;"></video>
                             </div>
                         </div>
                         <button class="carousel-button prev">
@@ -567,6 +586,18 @@
 
                 dots.forEach(dot => dot.classList.remove('active'));
                 dots[currentIndex].classList.add('active');
+
+                // Handle video play/pause
+                slides.forEach((slide, index) => {
+                    const video = slide.querySelector('video');
+                    if (video) {
+                        if (index === currentIndex) {
+                            video.play().catch(error => console.error("Error attempting to play video:", error));
+                        } else {
+                            video.pause();
+                        }
+                    }
+                });
 
                 // Re-initialize lucide icons if they are part of the slide content and get removed/re-added
                 // For this carousel, only buttons have icons, and they are persistent.
