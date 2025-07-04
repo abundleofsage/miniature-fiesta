@@ -2,7 +2,7 @@ name: Deploy to Dev on Pull Request
 
 on:
   pull_request:
-    types: [opened, synchronize] # Runs when a PR is opened or new commits are pushed to it
+    types: [opened, synchronize]
 
 jobs:
   deploy-dev:
@@ -18,17 +18,17 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-          # Navigate to the dev directory
-          cd /var/www/outfrontyouth.org.dev
-          
-          # Add dev directory to Git's safe list
-          git config --global --add safe.directory /var/www/outfrontyouth.org.dev
-          
-          # Fetch all branches from the remote repository
-          git fetch --all
-          
-          # Force checkout the specific branch from the pull request, discarding local changes
-          git checkout -f ${{ github.head_ref }}
-          
-          # Reset the local branch to match the remote, ensuring it's up to date
-          git reset --hard origin/${{ github.head_ref }}
+            # Navigate to the dev directory
+            cd /var/www/outfrontyouth.org.dev
+            
+            # Add dev directory to Git's safe list
+            git config --global --add safe.directory /var/www/outfrontyouth.org.dev
+            
+            # Fetch all branches from the remote repository
+            git fetch --all
+            
+            # Force checkout the specific branch from the pull request, discarding local changes
+            git checkout -f ${{ github.head_ref }}
+            
+            # Reset the local branch to match the remote, ensuring it's up to date
+            git reset --hard origin/${{ github.head_ref }}
