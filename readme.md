@@ -44,7 +44,6 @@ Your website consists of several key files and folders:
     *   `favicon.ico`: The icon that appears in the browser tab.
     *   `outfront-logo.png`: The main color logo for OutFront.
     *   `outfront-logo-bw.png`: A black-and-white version of the logo, used primarily for PDF flyers.
-    *   `bubble-bobble.png`: An image asset, potentially used by the image generation tools.
 *   **`LICENSE`**: Contains the software license for this project.
 *   **`.github/workflows/`**: Contains YAML files (`deploy.yml`, `pr-deploy.yml`) that define GitHub Actions for automating website deployment. (Developer-focused)
 *   **`.gitignore`**: A standard Git file specifying files and directories that Git should ignore. (Developer-focused)
