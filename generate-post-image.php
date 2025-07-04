@@ -4,7 +4,8 @@
 
 // --- ACTION REQUIRED ---
 // Paste your private Nextcloud iCal subscription URL here.
-$ical_url = 'https://cloud.outfrontyouth.org/remote.php/dav/public-calendars/o4BqHRSHaDJjiqjs?export'; // <-- PASTE YOUR URL HERE
+// IMPORTANT: Please verify this is the correct and active iCal URL.
+$ical_url = 'https://cloud.outfrontyouth.org/remote.php/dav/public-calendars/o4BqHRSHaDJjiqjs?export';
 
 // --- FONT CONFIGURATION ---
 // IMPORTANT: You must have a TrueType Font (.ttf) file for this to work.

@@ -19,10 +19,10 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-          git config --global --add safe.directory ${{ secrets.TARGET_DIR }}
-          cd ${{ secrets.TARGET_DIR }}
-          
-          # Fetch all changes from the remote
-          git fetch --all
-          # Reset the main branch to match the remote, discarding local changes
-          git reset --hard origin/main
+            git config --global --add safe.directory ${{ secrets.TARGET_DIR }}
+            cd ${{ secrets.TARGET_DIR }}
+             
+            # Fetch all changes from the remote
+            git fetch --all
+            # Reset the main branch to match the remote, discarding local changes
+            git reset --hard origin/main
